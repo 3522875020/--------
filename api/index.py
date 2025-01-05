@@ -23,7 +23,11 @@ def load_questions():
         
         if not file_path.exists():
             print(f"File not found: {file_path}")
-            return []
+            # 尝试从上级目录加载
+            file_path = Path(__file__).parent.parent / "quiz.md"
+            if not file_path.exists():
+                print(f"File not found in parent directory either: {file_path}")
+                return []
             
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
@@ -35,6 +39,7 @@ def load_questions():
         
         # 用于存储所有题目
         all_questions = []
+        question_map = {}
         
         for chapter_idx, chapter_content in enumerate(chapters, 1):
             # 提取题目
@@ -48,20 +53,41 @@ def load_questions():
                 # 清理题目文本
                 clean_question = ' '.join(question.strip().split())
                 
+                # 清理选项文本
+                clean_options = {
+                    'A': ' '.join(a.strip().split()),
+                    'B': ' '.join(b.strip().split()),
+                    'C': ' '.join(c.strip().split()),
+                    'D': ' '.join(d.strip().split())
+                }
+                
+                # 检查重复和矛盾
+                if clean_question in question_map:
+                    existing_q = question_map[clean_question]
+                    if existing_q['correct_answer'] != answer:
+                        print(f"\n警告：发现答案矛盾的题目：")
+                        print(f"题号 {existing_q['number']} 和 {num}")
+                        print(f"题目：{clean_question}")
+                        print(f"答案分别为：{existing_q['correct_answer']} 和 {answer}")
+                        continue
+                    else:
+                        print(f"\n警告：发现重复的题目：")
+                        print(f"题号 {existing_q['number']} 和 {num}")
+                        continue
+                
                 formatted_q = {
                     'chapter': chapter_idx,
                     'number': num,
                     'question': clean_question,
-                    'options': {
-                        'A': a.strip(),
-                        'B': b.strip(),
-                        'C': c.strip(),
-                        'D': d.strip()
-                    },
+                    'options': clean_options,
                     'correct_answer': answer
                 }
                 
+                question_map[clean_question] = formatted_q
                 all_questions.append(formatted_q)
+        
+        # 按题号排序
+        all_questions.sort(key=lambda x: (x['chapter'], int(x['number'])))
         
         print(f"Total questions loaded: {len(all_questions)}")
         return all_questions
