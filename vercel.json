@@ -5,7 +5,10 @@
       "src": "api/index.py",
       "use": "@vercel/python",
       "config": {
-        "includeFiles": ["api/data/**"]
+        "includeFiles": [
+          "quiz.md",
+          "api/data/quiz.md"
+        ]
       }
     },
     {

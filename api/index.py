@@ -18,25 +18,41 @@ app.add_middleware(
 
 def load_questions():
     try:
-        file_path = Path(__file__).parent / "data/quiz.md"
-        print(f"Trying to load questions from: {file_path}")
+        # 尝试多个可能的文件位置
+        possible_paths = [
+            Path(__file__).parent / "data/quiz.md",
+            Path(__file__).parent.parent / "quiz.md",
+            Path(__file__).parent / "quiz.md",
+        ]
         
-        if not file_path.exists():
-            print(f"File not found: {file_path}")
-            # 尝试从上级目录加载
-            file_path = Path(__file__).parent.parent / "quiz.md"
-            if not file_path.exists():
-                print(f"File not found in parent directory either: {file_path}")
-                return []
+        content = None
+        used_path = None
+        
+        for file_path in possible_paths:
+            print(f"Trying to load questions from: {file_path}")
+            if file_path.exists():
+                with open(file_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                used_path = file_path
+                print(f"Successfully loaded from: {file_path}")
+                break
+        
+        if content is None:
+            print("Failed to find quiz.md in any location")
+            print("Searched paths:", possible_paths)
+            return []
             
-        with open(file_path, "r", encoding="utf-8") as f:
-            content = f.read()
-            print(f"Content length: {len(content)}")
-            
+        print(f"Content length: {len(content)}")
+        
         # 按章节分割内容，使用更精确的正则表达式
         chapters = re.split(r'\*\*第\s*\d+\s*章[^*]*\*\*', content)[1:]
         print(f"Found {len(chapters)} chapters")
         
+        if not chapters:
+            print("Warning: No chapters found in content")
+            print("Content preview:", content[:500])
+            return []
+            
         # 用于存储所有题目
         all_questions = []
         question_map = {}
@@ -115,16 +131,29 @@ def load_questions():
 
 @app.get("/")
 async def root():
-    return {"status": "API is running"}
+    return {
+        "status": "API is running",
+        "message": "Use /api/questions to get questions"
+    }
 
 @app.get("/api/test")
 async def test():
-    questions = load_questions()
-    return {
-        "status": "ok",
-        "questions_count": len(questions),
-        "first_question": questions[0] if questions else None
-    }
+    """测试端点，用于检查API状态和题目加载"""
+    try:
+        questions = load_questions()
+        return {
+            "status": "ok",
+            "questions_count": len(questions),
+            "first_question": questions[0] if questions else None,
+            "chapters": sorted(set(q["chapter"] for q in questions)) if questions else []
+        }
+    except Exception as e:
+        import traceback
+        return {
+            "status": "error",
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
 
 @app.get("/api/questions")
 async def get_questions():
