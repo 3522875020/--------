@@ -211,4 +211,59 @@ body {
 
 .next-button:hover {
   background-color: #1976d2;
+}
+
+/* Markdown 样式 */
+.markdown-p {
+  margin: 0.5em 0;
+  line-height: 1.5;
+}
+
+.markdown-img {
+  max-width: 100%;
+  height: auto;
+  margin: 1em 0;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+.markdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+}
+
+.markdown-table th,
+.markdown-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.markdown-table th {
+  background-color: #f5f5f5;
+}
+
+.markdown-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* 调整选项中的 Markdown 内容样式 */
+.option .markdown-p {
+  display: inline;
+  margin: 0;
+}
+
+.option .markdown-img {
+  margin: 0.5em 0;
+}
+
+.option .table-container {
+  margin: 0.5em 0;
 } 

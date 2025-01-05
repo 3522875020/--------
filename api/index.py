@@ -33,8 +33,8 @@ def load_questions():
             content = f.read()
             print(f"Content length: {len(content)}")
             
-        # 按章节分割内容
-        chapters = re.split(r'\*\*第.*?章.*?\*\*', content)[1:]
+        # 按章节分割内容，使用更精确的正则表达式
+        chapters = re.split(r'\*\*第\s*\d+\s*章[^*]*\*\*', content)[1:]
         print(f"Found {len(chapters)} chapters")
         
         # 用于存储所有题目
@@ -42,13 +42,27 @@ def load_questions():
         question_map = {}
         
         for chapter_idx, chapter_content in enumerate(chapters, 1):
-            # 提取题目
-            pattern = r'(\d+)\.\s+题目：(.*?)\n\s+\*\s+A、(.*?)\n\s+\*\s+B、(.*?)\n\s+\*\s+C、(.*?)\n\s+\*\s+D、(.*?)\n\s+答案：([A-D])'
-            questions = re.findall(pattern, chapter_content, re.DOTALL)
-            print(f"Chapter {chapter_idx}: Found {len(questions)} questions")
+            # 使用更精确的题目匹配模式
+            pattern = (
+                r'(?:^|\n)\s*(\d+)\.\s*题目：(.*?)'  # 题号和题目
+                r'(?:\n\s*\*\s*A[、．.]\s*(.*?))?'   # 选项A
+                r'(?:\n\s*\*\s*B[、．.]\s*(.*?))?'   # 选项B
+                r'(?:\n\s*\*\s*C[、．.]\s*(.*?))?'   # 选项C
+                r'(?:\n\s*\*\s*D[、．.]\s*(.*?))?'   # 选项D
+                r'\n\s*答案：\s*([A-D])'             # 答案
+            )
             
-            for q in questions:
-                num, question, a, b, c, d, answer = q
+            questions = re.finditer(pattern, chapter_content, re.DOTALL)
+            question_count = 0
+            
+            for match in questions:
+                question_count += 1
+                num, question, a, b, c, d, answer = match.groups()
+                
+                # 确保所有选项都存在
+                if not all([a, b, c, d]):
+                    print(f"警告：第{chapter_idx}章第{num}题选项不完整")
+                    continue
                 
                 # 清理题目文本
                 clean_question = ' '.join(question.strip().split())
@@ -85,6 +99,8 @@ def load_questions():
                 
                 question_map[clean_question] = formatted_q
                 all_questions.append(formatted_q)
+            
+            print(f"Chapter {chapter_idx}: Found {question_count} questions")
         
         # 按题号排序
         all_questions.sort(key=lambda x: (x['chapter'], int(x['number'])))

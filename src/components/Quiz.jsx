@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
+import ReactMarkdown from 'react-markdown'
+import rehypeRaw from 'rehype-raw'
+import remarkGfm from 'remark-gfm'
 
 function Quiz() {
   const [questions, setQuestions] = useState([])
@@ -83,6 +86,33 @@ function Quiz() {
     }
   }
 
+  const renderMarkdown = (text) => {
+    return (
+      <ReactMarkdown
+        rehypePlugins={[rehypeRaw]}
+        remarkPlugins={[remarkGfm]}
+        components={{
+          p: ({node, ...props}) => <p className="markdown-p" {...props} />,
+          img: ({node, ...props}) => (
+            <img 
+              className="markdown-img" 
+              loading="lazy" 
+              {...props} 
+              style={{maxWidth: '100%', height: 'auto'}}
+            />
+          ),
+          table: ({node, ...props}) => (
+            <div className="table-container">
+              <table className="markdown-table" {...props} />
+            </div>
+          )
+        }}
+      >
+        {text}
+      </ReactMarkdown>
+    )
+  }
+
   if (loading) {
     return <div className="loading">加载中...</div>
   }
@@ -112,7 +142,7 @@ function Quiz() {
         第 {currentQuestion + 1}/{questions.length} 题
       </div>
       <div className="question">
-        {question.question}
+        {renderMarkdown(question.question)}
       </div>
       <div className="options">
         {Object.entries(question.options).map(([key, value]) => (
@@ -128,7 +158,7 @@ function Quiz() {
             }`}
             disabled={showAnswer}
           >
-            {key}. {value}
+            {key}. {renderMarkdown(value)}
           </button>
         ))}
       </div>
