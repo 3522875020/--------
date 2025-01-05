@@ -82,11 +82,26 @@ def load_questions():
         print(f"Content length: {len(content)}")
         print("Content preview:", content[:200])
         
-        # 修改章节分割正则表达式以匹配中文数字
-        chapters = re.split(r'\*\*第[一二三四五六七八九十]+章[^*]*\*\*', content)[1:]
-        # 如果没有找到章节，尝试阿拉伯数字格式
-        if not chapters:
-            chapters = re.split(r'\*\*第\s*\d+\s*章[^*]*\*\*', content)[1:]
+        # 更灵活的章节分割正则表达式
+        chapter_pattern = r'\*\*第[一二三四五六七八九十\d]+章[^*]*\*\*'
+        
+        # 先找到所有章节标题
+        chapter_titles = re.findall(chapter_pattern, content)
+        print(f"Found chapter titles: {chapter_titles}")
+        
+        # 使用章节标题分割内容
+        chapters = []
+        last_end = 0
+        for title in chapter_titles:
+            start = content.find(title, last_end)
+            if start == -1:
+                continue
+            if last_end > 0:
+                chapters.append(content[last_end:start])
+            last_end = start + len(title)
+        # 添加最后一个章节
+        if last_end < len(content):
+            chapters.append(content[last_end:])
             
         print(f"Found {len(chapters)} chapters")
         
@@ -97,7 +112,6 @@ def load_questions():
             
         # 用于存储所有题目
         all_questions = []
-        question_map = {}
         
         for chapter_idx, chapter_content in enumerate(chapters, 1):
             print(f"\nProcessing Chapter {chapter_idx}")
@@ -106,11 +120,11 @@ def load_questions():
             # 使用更精确的题目匹配模式
             pattern = (
                 r'(?:^|\n)\s*(\d+)\.\s*题目：(.*?)'  # 题号和题目
-                r'(?:\n\s*\*\s*A[、．.]\s*(.*?))?'   # 选项A
-                r'(?:\n\s*\*\s*B[、．.]\s*(.*?))?'   # 选项B
-                r'(?:\n\s*\*\s*C[、．.]\s*(.*?))?'   # 选项C
-                r'(?:\n\s*\*\s*D[、．.]\s*(.*?))?'   # 选项D
-                r'\n\s*答案：\s*([A-D])'             # 答案
+                r'(?:\n\s*\*\s*[A][\s.．、]\s*(.*?))'   # 选项A
+                r'(?:\n\s*\*\s*[B][\s.．、]\s*(.*?))'   # 选项B
+                r'(?:\n\s*\*\s*[C][\s.．、]\s*(.*?))'   # 选项C
+                r'(?:\n\s*\*\s*[D][\s.．、]\s*(.*?))'   # 选项D
+                r'(?:\n\s*答案：\s*([A-D]))'            # 答案
             )
             
             questions = list(re.finditer(pattern, chapter_content, re.DOTALL))
@@ -119,11 +133,6 @@ def load_questions():
             for match in questions:
                 num, question, a, b, c, d, answer = match.groups()
                 print(f"Processing question {num}")
-                
-                # 确保所有选项都存在
-                if not all([a, b, c, d]):
-                    print(f"警告：第{chapter_idx}章第{num}题选项不完整")
-                    continue
                 
                 # 清理题目文本
                 clean_question = ' '.join(question.strip().split())
