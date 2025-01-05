@@ -1,27 +1,14 @@
 {
-  "5": {
+  "4": {
     "chapter": 5,
-    "question": "依据住建部《居住区环境景观设计导则》，乔木群植时的栽植间距下限是（）。",
+    "question": "下列对植物种植设计图描述正确的是（ ）。",
     "options": {
-      "A": "4m",
-      "B": "3m",
-      "C": "2 m",
-      "D": "1m"
+      "A": "标注植物种植点的坐标和标高",
+      "B": "绘制植物种植剖面图或断面图",
+      "C": "明确植物栽植或养护的要求",
+      "D": "应用于详细设计阶段"
     },
-    "correct_answer": "C",
-    "your_answer": "A",
-    "correct_count": 0
-  },
-  "7": {
-    "chapter": 5,
-    "question": "依据《居住绿地设计标准》（CJJT 294—2019），南窗的建筑外墙至乔木中心最小间距是（）。",
-    "options": {
-      "A": "6m",
-      "B": "5.5m",
-      "C": "4.5m",
-      "D": "3m"
-    },
-    "correct_answer": "B",
+    "correct_answer": "D",
     "your_answer": "C",
     "correct_count": 0
   }
