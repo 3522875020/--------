@@ -63,11 +63,9 @@ function Quiz() {
       })
     }
 
-    if (isWrongQuestionMode) {
-      setShowAnswer(true)
-    } else {
-      goToNextQuestion()
-    }
+    question.your_answer = answer
+    
+    setShowAnswer(true)
   }
 
   const goToNextQuestion = () => {
