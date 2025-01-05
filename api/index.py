@@ -166,6 +166,23 @@ def load_questions():
         print(traceback.format_exc())
         return []
 
+def shuffle_options(question):
+    """随机打乱选项顺序并返回新的选项和正确答案"""
+    options = question['options']
+    # 创建选项列表
+    options_list = list(options.items())
+    # 记住正确答案对应的选项内容
+    correct_content = options[question['correct_answer']]
+    # 打乱选项
+    random.shuffle(options_list)
+    
+    # 创建新的选项字典
+    new_options = {chr(65+i): content for i, (_, content) in enumerate(options_list)}
+    # 找到正确答案的新选项字母
+    new_correct = next(key for key, value in new_options.items() if value == correct_content)
+    
+    return new_options, new_correct
+
 @app.get("/")
 async def root():
     return {
@@ -178,10 +195,18 @@ async def test():
     """测试端点，用于检查API状态和题目加载"""
     try:
         questions = load_questions()
+        # 获取一个随机题目作为示例
+        sample_question = None
+        if questions:
+            sample_question = random.choice(questions).copy()
+            new_options, new_correct = shuffle_options(sample_question)
+            sample_question['options'] = new_options
+            sample_question['correct_answer'] = new_correct
+            
         return {
             "status": "ok",
             "questions_count": len(questions),
-            "first_question": questions[0] if questions else None,
+            "sample_question": sample_question,
             "chapters": sorted(set(q["chapter"] for q in questions)) if questions else []
         }
     except Exception as e:
@@ -197,7 +222,21 @@ async def get_questions():
     questions = load_questions()
     if not questions:
         return {"error": "Failed to load questions"}
-    return {"questions": questions}
+    
+    # 创建题目副本以免影响原始数据
+    shuffled_questions = questions.copy()
+    # 使用当前时间作为随机种子
+    random.seed(datetime.now().timestamp())
+    # 随机打乱题目顺序
+    random.shuffle(shuffled_questions)
+    
+    # 随机打乱每个题目的选项
+    for q in shuffled_questions:
+        new_options, new_correct = shuffle_options(q)
+        q['options'] = new_options
+        q['correct_answer'] = new_correct
+    
+    return {"questions": shuffled_questions}
 
 @app.get("/api/chapters")
 async def get_chapters():
@@ -212,7 +251,23 @@ async def get_chapter_questions(chapter: int):
     questions = load_questions()
     if not questions:
         return {"error": "Failed to load questions"}
-    chapter_questions = [q for q in questions if q["chapter"] == chapter]
+    
+    # 筛选指定章节的题目
+    chapter_questions = [q.copy() for q in questions if q["chapter"] == chapter]
+    if not chapter_questions:
+        return {"error": f"No questions found for chapter {chapter}"}
+    
+    # 使用当前时间作为随机种子
+    random.seed(datetime.now().timestamp())
+    # 随机打乱题目顺序
+    random.shuffle(chapter_questions)
+    
+    # 随机打乱每个题目的选项
+    for q in chapter_questions:
+        new_options, new_correct = shuffle_options(q)
+        q['options'] = new_options
+        q['correct_answer'] = new_correct
+    
     return {"questions": chapter_questions}
 
 @app.post("/api/wrong-questions")
