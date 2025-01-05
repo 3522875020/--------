@@ -4,6 +4,7 @@ import json
 import random
 from datetime import datetime
 from pathlib import Path
+import re
 
 app = FastAPI()
 
@@ -16,20 +17,67 @@ app.add_middleware(
 )
 
 def load_questions():
-    with open(Path(__file__).parent / "data/quiz.md", "r", encoding="utf-8") as f:
-        content = f.read()
-    # 使用quiz.py中的解析逻辑
-    # ...
-    return questions
+    try:
+        with open(Path(__file__).parent / "data/quiz.md", "r", encoding="utf-8") as f:
+            content = f.read()
+        
+        # 按章节分割内容
+        chapters = re.split(r'\*\*第.*?章.*?\*\*', content)[1:]
+        
+        # 用于存储所有题目
+        all_questions = []
+        
+        for chapter_idx, chapter_content in enumerate(chapters, 1):
+            # 提取题目
+            pattern = r'(\d+)\.\s+题目：(.*?)\n\s+\*\s+A、(.*?)\n\s+\*\s+B、(.*?)\n\s+\*\s+C、(.*?)\n\s+\*\s+D、(.*?)\n\s+答案：([A-D])'
+            questions = re.findall(pattern, chapter_content, re.DOTALL)
+            
+            for q in questions:
+                num, question, a, b, c, d, answer = q
+                
+                # 清理题目文本
+                clean_question = ' '.join(question.strip().split())
+                
+                formatted_q = {
+                    'chapter': chapter_idx,
+                    'number': num,
+                    'question': clean_question,
+                    'options': {
+                        'A': a.strip(),
+                        'B': b.strip(),
+                        'C': c.strip(),
+                        'D': d.strip()
+                    },
+                    'correct_answer': answer
+                }
+                
+                all_questions.append(formatted_q)
+        
+        return all_questions
+    except Exception as e:
+        print(f"Error loading questions: {e}")
+        return []
 
 @app.get("/api/questions")
 async def get_questions():
     questions = load_questions()
+    if not questions:
+        return {"error": "Failed to load questions"}
     return {"questions": questions}
+
+@app.get("/api/chapters")
+async def get_chapters():
+    questions = load_questions()
+    if not questions:
+        return {"error": "Failed to load questions"}
+    chapters = sorted(set(q["chapter"] for q in questions))
+    return {"chapters": chapters}
 
 @app.get("/api/questions/{chapter}")
 async def get_chapter_questions(chapter: int):
     questions = load_questions()
+    if not questions:
+        return {"error": "Failed to load questions"}
     chapter_questions = [q for q in questions if q["chapter"] == chapter]
     return {"questions": chapter_questions}
 
