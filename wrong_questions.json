@@ -1,41 +1,41 @@
 {
   "11": {
-    "chapter": 4,
-    "question": "下列藤本植物中，适合用墙面绿化的是（ ）。",
+    "chapter": 3,
+    "question": "下面植物属于典型的阳性植物的一组是（ ）。",
     "options": {
-      "A": "云南黄素馨",
-      "B": "五叶地锦",
-      "C": "叶子花",
-      "D": "紫藤"
+      "A": "含笑、茉莉",
+      "B": "合欢、玉兰",
+      "C": "山茶、米兰",
+      "D": "杜鹃、栀子"
     },
     "correct_answer": "B",
-    "your_answer": "D",
+    "your_answer": "C",
     "correct_count": 0
   },
-  "8": {
-    "chapter": 4,
-    "question": "下列对于灌木的主要造景功能表述不正确的是（ ）。",
+  "9": {
+    "chapter": 2,
+    "question": "下列植物中属于春色叶类的树种是（ ）。",
     "options": {
-      "A": "用作色带或形成纹样图案",
-      "B": "用作花境、喷泉、雕塑的背景，美化挡土墙",
-      "C": "分割空间，屏障视线，组织游览路线",
-      "D": "做主景构图，作规则式园林的区划线"
+      "A": "银杏",
+      "B": "乌桕",
+      "C": "桂花",
+      "D": "香椿"
     },
     "correct_answer": "D",
     "your_answer": "C",
     "correct_count": 0
   },
-  "9": {
-    "chapter": 4,
-    "question": "下列植物景观不属于藤本植物常见应用方式的是（ ）。",
+  "8": {
+    "chapter": 12,
+    "question": "组团绿地的与服务半径一般是（）。",
     "options": {
-      "A": "棚架式绿化",
-      "B": "篱垣式绿化",
-      "C": "墙面绿化",
-      "D": "林荫道式绿化"
+      "A": "50-100m",
+      "B": "60-200m",
+      "C": "60-150m",
+      "D": "60-120m"
     },
-    "correct_answer": "D",
-    "your_answer": "A",
+    "correct_answer": "B",
+    "your_answer": "C",
     "correct_count": 0
   }
 }
