@@ -8,9 +8,11 @@ function Quiz() {
   const [wrongQuestions, setWrongQuestions] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showAnswer, setShowAnswer] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
   const selectedChapter = location.state?.chapter
+  const isWrongQuestionMode = location.pathname === '/wrong-questions'
 
   useEffect(() => {
     fetchQuestions()
@@ -21,15 +23,6 @@ function Quiz() {
       setLoading(true)
       setError(null)
       
-      // 先测试API是否正常运行
-      const testResponse = await fetch('/api/test')
-      if (!testResponse.ok) {
-        throw new Error('API test failed')
-      }
-      const testData = await testResponse.json()
-      console.log('API test result:', testData)
-      
-      // 获取实际题目
       const url = selectedChapter 
         ? `/api/questions/${selectedChapter}`
         : '/api/questions'
@@ -38,7 +31,6 @@ function Quiz() {
         throw new Error(`Failed to fetch questions: ${response.statusText}`)
       }
       const data = await response.json()
-      console.log('Questions data:', data)
       
       if (data.error) {
         throw new Error(data.error)
@@ -52,6 +44,44 @@ function Quiz() {
       setError(error.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleAnswer = (answer) => {
+    const question = questions[currentQuestion]
+    const isCorrect = answer === question.correct_answer
+
+    if (isCorrect) {
+      setScore(score + 1)
+    } else {
+      setWrongQuestions({
+        ...wrongQuestions,
+        [question.number]: {
+          ...question,
+          your_answer: answer
+        }
+      })
+    }
+
+    if (isWrongQuestionMode) {
+      setShowAnswer(true)
+    } else {
+      goToNextQuestion()
+    }
+  }
+
+  const goToNextQuestion = () => {
+    setShowAnswer(false)
+    if (currentQuestion + 1 < questions.length) {
+      setCurrentQuestion(currentQuestion + 1)
+    } else {
+      navigate('/result', { 
+        state: { 
+          score, 
+          total: questions.length, 
+          wrongQuestions 
+        } 
+      })
     }
   }
 
@@ -77,33 +107,6 @@ function Quiz() {
     </div>
   }
 
-  const handleAnswer = (answer) => {
-    const question = questions[currentQuestion]
-    if (answer === question.correct_answer) {
-      setScore(score + 1)
-    } else {
-      setWrongQuestions({
-        ...wrongQuestions,
-        [question.number]: {
-          ...question,
-          your_answer: answer
-        }
-      })
-    }
-
-    if (currentQuestion + 1 < questions.length) {
-      setCurrentQuestion(currentQuestion + 1)
-    } else {
-      navigate('/result', { 
-        state: { 
-          score, 
-          total: questions.length, 
-          wrongQuestions 
-        } 
-      })
-    }
-  }
-
   const question = questions[currentQuestion]
   return (
     <div className="quiz">
@@ -117,13 +120,40 @@ function Quiz() {
         {Object.entries(question.options).map(([key, value]) => (
           <button
             key={key}
-            onClick={() => handleAnswer(key)}
-            className="option"
+            onClick={() => !showAnswer && handleAnswer(key)}
+            className={`option ${
+              showAnswer ? 
+                key === question.correct_answer ? 
+                  'correct' : 
+                  'wrong' 
+                : ''
+            }`}
+            disabled={showAnswer}
           >
             {key}. {value}
           </button>
         ))}
       </div>
+      {showAnswer && (
+        <div className="answer-section">
+          <div className={`answer-result ${
+            question.your_answer === question.correct_answer ? 
+              'correct' : 
+              'wrong'
+          }`}>
+            {question.your_answer === question.correct_answer ? 
+              '✓ 回答正确！' : 
+              `✗ 回答错误。正确答案是：${question.correct_answer}`
+            }
+          </div>
+          <button 
+            className="next-button"
+            onClick={goToNextQuestion}
+          >
+            下一题
+          </button>
+        </div>
+      )}
     </div>
   )
 }
