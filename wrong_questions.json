@@ -1,38 +1,25 @@
 {
-  "11": {
-    "chapter": 3,
-    "question": "下面植物属于典型的阳性植物的一组是（ ）。",
+  "5": {
+    "chapter": 5,
+    "question": "依据住建部《居住区环境景观设计导则》，乔木群植时的栽植间距下限是（）。",
     "options": {
-      "A": "含笑、茉莉",
-      "B": "合欢、玉兰",
-      "C": "山茶、米兰",
-      "D": "杜鹃、栀子"
+      "A": "4m",
+      "B": "3m",
+      "C": "2 m",
+      "D": "1m"
     },
-    "correct_answer": "B",
-    "your_answer": "C",
+    "correct_answer": "C",
+    "your_answer": "A",
     "correct_count": 0
   },
-  "9": {
-    "chapter": 2,
-    "question": "下列植物中属于春色叶类的树种是（ ）。",
+  "7": {
+    "chapter": 5,
+    "question": "依据《居住绿地设计标准》（CJJT 294—2019），南窗的建筑外墙至乔木中心最小间距是（）。",
     "options": {
-      "A": "银杏",
-      "B": "乌桕",
-      "C": "桂花",
-      "D": "香椿"
-    },
-    "correct_answer": "D",
-    "your_answer": "C",
-    "correct_count": 0
-  },
-  "8": {
-    "chapter": 12,
-    "question": "组团绿地的与服务半径一般是（）。",
-    "options": {
-      "A": "50-100m",
-      "B": "60-200m",
-      "C": "60-150m",
-      "D": "60-120m"
+      "A": "6m",
+      "B": "5.5m",
+      "C": "4.5m",
+      "D": "3m"
     },
     "correct_answer": "B",
     "your_answer": "C",

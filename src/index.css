@@ -71,4 +71,89 @@ body {
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 8px;
+}
+
+.main-menu {
+  text-align: center;
+  padding: 40px;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 300px;
+  margin: 40px auto;
+}
+
+.menu-buttons button {
+  padding: 15px 30px;
+  font-size: 1.2em;
+  border: none;
+  border-radius: 8px;
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.menu-buttons button:hover {
+  background-color: #45a049;
+}
+
+.chapter-select {
+  text-align: center;
+  padding: 40px;
+}
+
+.chapter-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  max-width: 800px;
+  margin: 40px auto;
+}
+
+.chapter-button {
+  padding: 20px;
+  font-size: 1.1em;
+  border: 2px solid #4CAF50;
+  border-radius: 8px;
+  background-color: white;
+  color: #4CAF50;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.chapter-button:hover {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.back-button {
+  padding: 10px 20px;
+  font-size: 1em;
+  border: none;
+  border-radius: 4px;
+  background-color: #666;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.back-button:hover {
+  background-color: #555;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.2em;
+  color: #666;
+}
+
+.error {
+  text-align: center;
+  padding: 40px;
+  color: #d32f2f;
 } 

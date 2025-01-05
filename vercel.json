@@ -19,10 +19,15 @@
       "dest": "api/index.py"
     },
     {
-      "handle": "filesystem"
+      "src": "^/assets/(.*)",
+      "dest": "/assets/$1"
     },
     {
-      "src": "/(.*)",
+      "src": "^/favicon.ico",
+      "dest": "/favicon.ico"
+    },
+    {
+      "src": ".*",
       "dest": "/index.html"
     }
   ]
