@@ -19,19 +19,34 @@ function Quiz() {
   const fetchQuestions = async () => {
     try {
       setLoading(true)
+      setError(null)
+      
+      // 先测试API是否正常运行
+      const testResponse = await fetch('/api/test')
+      if (!testResponse.ok) {
+        throw new Error('API test failed')
+      }
+      const testData = await testResponse.json()
+      console.log('API test result:', testData)
+      
+      // 获取实际题目
       const url = selectedChapter 
         ? `/api/questions/${selectedChapter}`
         : '/api/questions'
       const response = await fetch(url)
       if (!response.ok) {
-        throw new Error('Failed to fetch questions')
+        throw new Error(`Failed to fetch questions: ${response.statusText}`)
       }
       const data = await response.json()
+      console.log('Questions data:', data)
+      
       if (data.error) {
         throw new Error(data.error)
       }
+      if (!data.questions || !Array.isArray(data.questions)) {
+        throw new Error('Invalid questions data format')
+      }
       setQuestions(data.questions)
-      setError(null)
     } catch (error) {
       console.error('Error fetching questions:', error)
       setError(error.message)

@@ -18,11 +18,20 @@ app.add_middleware(
 
 def load_questions():
     try:
-        with open(Path(__file__).parent / "data/quiz.md", "r", encoding="utf-8") as f:
-            content = f.read()
+        file_path = Path(__file__).parent / "data/quiz.md"
+        print(f"Trying to load questions from: {file_path}")
         
+        if not file_path.exists():
+            print(f"File not found: {file_path}")
+            return []
+            
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            print(f"Content length: {len(content)}")
+            
         # 按章节分割内容
         chapters = re.split(r'\*\*第.*?章.*?\*\*', content)[1:]
+        print(f"Found {len(chapters)} chapters")
         
         # 用于存储所有题目
         all_questions = []
@@ -31,6 +40,7 @@ def load_questions():
             # 提取题目
             pattern = r'(\d+)\.\s+题目：(.*?)\n\s+\*\s+A、(.*?)\n\s+\*\s+B、(.*?)\n\s+\*\s+C、(.*?)\n\s+\*\s+D、(.*?)\n\s+答案：([A-D])'
             questions = re.findall(pattern, chapter_content, re.DOTALL)
+            print(f"Chapter {chapter_idx}: Found {len(questions)} questions")
             
             for q in questions:
                 num, question, a, b, c, d, answer = q
@@ -53,10 +63,26 @@ def load_questions():
                 
                 all_questions.append(formatted_q)
         
+        print(f"Total questions loaded: {len(all_questions)}")
         return all_questions
     except Exception as e:
         print(f"Error loading questions: {e}")
+        import traceback
+        print(traceback.format_exc())
         return []
+
+@app.get("/")
+async def root():
+    return {"status": "API is running"}
+
+@app.get("/api/test")
+async def test():
+    questions = load_questions()
+    return {
+        "status": "ok",
+        "questions_count": len(questions),
+        "first_question": questions[0] if questions else None
+    }
 
 @app.get("/api/questions")
 async def get_questions():
